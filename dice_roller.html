@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Pathfinder 1e Dice Roller</h2>
+
+<input type="text" id="bab" placeholder="bab">
+<input type="text" id="bonus" placeholder="Str or Dex">
+<input type="text" id="pen" placeholder="penalties">
+<input type="text" id="crit_range" placeholder="crit range">
+<br />
+<p>Extra hits</p>
+<label for="b_o_fervor_atk">
+    <input type="checkbox" id="b_o_fervor_atk"> Blessing of Fervor
+</label>
+<label for="haste">
+    <input type="checkbox" id="haste"> Haste
+</label>
+<label for="rapid_shot">
+    <input type="checkbox" id="rapid_shot"> Rapid Shot
+</label>
+<label for="m_rapid_shot">
+    <input type="checkbox" id="m_rapid_shot"> Mythic Rapid Shot
+</label>
+<br />
+
+<p>Bonuses</p>
+<label for="arcane_strike">
+    <input type="checkbox" id="arcane_strike"> Arcane Strike  
+</label>
+<label for="battle_cry">
+    <input type="checkbox" id="battle_cry"> Battle Cry  
+</label>
+<label for="b_o_fervor_b">
+    <input type="checkbox" id="b_o_fervor_b"> Blessing of Fervor
+</label>
+<label for="crit_focus">
+    <input type="checkbox" id="crit_focus"> Critical Focus
+</label>
+<label for="dfa">
+    <input type="checkbox" id="dfa"> Death From Above
+</label>
+<label for="dog">
+    <input type="checkbox" id="dog"> Death or Glory
+</label>
+<label for="db">
+    <input type="checkbox" id="db"> Desperate Battler
+</label>
+<br />
+<label for="pbs">
+    <input type="checkbox" id="pbs"> Point Blank Shot  
+</label>
+<label for="tech_adept">
+    <input type="checkbox" id="tech_adept"> Technological Adept  
+</label>
+<label for="wf">
+    <input type="checkbox" id="wf"> Weapon Focus  
+</label>
+<label for="gwf">
+    <input type="checkbox" id="gwf"> Greater Weapon Focus  
+</label>
+<br />
+
+<p>Penalties</p>
+<label for="b_a">
+    <input type="checkbox" id="b_a"> Bloody Assault
+</label>	
+<label for="b_a">
+    <input type="checkbox" id="b_a"> Bloody Assault
+</label>	
+<label for="c_expertise">
+    <input type="checkbox" id="c_expertise"> Combat Expertise
+</label>
+<label for="deadly_aim">
+    <input type="checkbox" id="deadly_aim"> Deadly Aim
+</label>
+<label for="p_strike">
+    <input type="checkbox" id="p_strike"> Piranha Strike
+</label>
+<label for="power_atk">
+    <input type="checkbox" id="power_atk"> Power Attack
+</label>
+
+<br />
+
+<br />
+<br />
+<button type="Roll the Dice" onclick="fullAtk();"> Take a chance, Roll the Dice</button>
+
+<p id="result"></p>
+<p id="bof_atk"></p>
+<p id="haste_atk"></p>
+<p id="rs_atk"></p>
+<p id="m_rs_atk"></p>
+<p id="iter1"></p>
+<p id="iter2"></p>
+<p id="iter3"></p>
+
+
+<script>
+function fullAtk(){
+    document.getElementById("result").innerHTML = "";
+	document.getElementById("bof_atk").innerHTML = "";
+	document.getElementById("haste_atk").innerHTML = "";
+	document.getElementById("rs_atk").innerHTML = "";
+    document.getElementById("m_rs_atk").innerHTML = "";
+    document.getElementById("iter1").innerHTML = "";
+    document.getElementById("iter2").innerHTML = "";
+	document.getElementById("iter3").innerHTML = "";
+
+    var y = parseInt(document.getElementById("bab").value);
+	
+	document.getElementById("result").innerHTML = "Attack 1: " + attack_logic(0);
+	
+	if(y > 5 && y < 11)
+	{
+	    document.getElementById("iter1").innerHTML = "Attack 2: " + attack_logic(5);
+		
+	}
+	else if(y > 10 && y < 16)
+	{
+	    document.getElementById("iter1").innerHTML = "Attack 2: " + attack_logic(5);
+		document.getElementById("iter2").innerHTML = "Attack 3: " + attack_logic(10);
+		
+
+	}
+	else if(y > 15)
+	{
+	    document.getElementById("iter1").innerHTML = "Attack 2: " + attack_logic(5);
+		document.getElementById("iter2").innerHTML = "Attack 3: " + attack_logic(10);
+		document.getElementById("iter3").innerHTML = "Attack 4: " + attack_logic(15);
+		
+	}
+	
+	if(document.getElementById("haste").checked === true)
+	{
+	    document.getElementById("haste_atk").innerHTML = "Hastened Attack: " + attack_logic(0);
+	}
+	
+	if(document.getElementById("b_o_fervor_atk").checked === true)
+	{
+	    document.getElementById("bof_atk").innerHTML = "Blessing of Fervor Attack: " + attack_logic(0);
+	}
+	
+	if(document.getElementById("rapid_shot").checked === true)
+	{
+	    document.getElementById("rs_atk").innerHTML = "Rapid Shot Attack: " + attack_logic(0);
+	}
+	
+	if(document.getElementById("m_rapid_shot").checked === true)
+	{
+	    document.getElementById("m_rs_atk").innerHTML = "Mythic Rapid Shot Attack: " + attack_logic(0);
+	}
+}
+
+function attack_logic(iter){
+    var roll = roll_dice();
+	var bab = parseInt(document.getElementById("bab").value);
+	let bonus = parseInt(document.getElementById("bonus").value);
+	var pen = parseInt(document.getElementById("pen").value);
+	var crit_range = parseInt(document.getElementById("crit_range").value);
+	
+	if(document.getElementById("haste").checked === true){
+	    bonus += 1;
+	}
+	
+	if(document.getElementById("wf").checked === true){
+	    bonus += 1;
+	}
+	
+	if(document.getElementById("gwf").checked === true){
+	    bonus += 1;
+	}
+	
+	var attack_total = attack(bab, bonus, pen, roll, iter);
+	var crit = check_for_crit(roll, crit_range);
+	var crit_chance = attack(bab, bonus, pen, roll_dice(), iter);
+	
+	var result = "" + attack_total + " (" + roll + ") ";
+	
+	if(crit === 1){
+	    result += "Critical!  Does this confirm: " + crit_chance;
+	}
+	else if (crit === 2){
+	    result += "Crit chance. Check to see if hits.  Does this confirm: " + crit_chance;
+	}
+	else if(crit === 3){
+	    result += "Crit Fail! You done fucked up there pal";
+	}
+	return result;
+}
+
+/*checks if the imported value is a 20 or within the set crit range.
+  - may seperate out into two classes to accomicate crit range.*/
+function check_for_crit(roll, crit_range){
+    var val = 0;
+    if(roll === 20)
+	{
+	    val = 1;
+	}
+	else if(roll >= crit_range)
+	{
+	    val = 2
+	}
+	else if(roll === 1)
+	{
+	    val = 3;
+	}
+	return val;
+}
+
+/*combinds the base attack bonus, other bonuses and penalties with the roll and the penalties from iterative attacks*/
+function attack(bab, bonus, pen, roll, iter){
+    return roll + bab + bonus - pen - iter;
+}
+
+/*rolls a random number between 1 and 20*/
+function roll_dice(){
+  return Math.floor((Math.random() * 20) + 1);
+}
+
+function sum_penalty(){
+   var pen = 0;
+   if(document.getElementById("").checked === true){
+       pen += 2;
+   }
+   return 0
+}
+
+function sum_bonus(){
+   var sum = 0;
+   if(document.getElementById("").checked === true){
+       sum += 1;
+   }
+   
+   
+   return sum;
+}
+
+</script>
+
+</body>
+</html> 
